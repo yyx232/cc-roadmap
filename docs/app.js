@@ -3,7 +3,7 @@
 // ============================================================
 
 // ---------- 配置 ----------
-const DEEPSEEK_API_KEY = 'YOUR_DEEPSEEK_API_KEY_HERE'; // ⚠️ 填入你的 DeepSeek API Key
+const DEEPSEEK_API_KEY = 'DEEPSEEK_API_KEY_PLACEHOLDER';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
 
 // ---------- 问卷数据 ----------
