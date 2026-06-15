@@ -271,28 +271,43 @@ async function callDeepSeek(systemPrompt, userMessage) {
 async function generateRoute() {
     const local = generateLocalRoute();
 
-    // 构建用户画像
+    // 构建用户画像（人类可读）
+    const labels = {
+        major: {cs:'计算机/AI相关', engineering:'理工科(非计算机)', business:'商科/经管', humanities:'文科/社科', art:'艺术/设计', other:'其他'},
+        year: {freshman:'大一', sophomore:'大二', junior:'大三', senior:'大四', grad:'研究生', graduated:'已毕业'},
+        tech_level: {zero:'完全零基础，没写过代码', beginner:'会一点，跟教程写过', intermediate:'能独立完成小项目', advanced:'有实习或工作经验'},
+        cc_knowledge: {never:'从没听说过CC', heard:'听说过但没用过', tried:'用过几次', regular:'经常使用'},
+        goal: {job:'找好工作/实习', side_income:'赚零花钱/副业', efficiency:'提升学习效率', project:'做自己的项目', explore:'探索了解'},
+        time: {minimal:'每周不到2小时', low:'每周2-5小时', medium:'每周5-10小时', high:'每周10小时以上'},
+    };
+
     const profileSummary = `
-用户画像：
-- 专业：${answers.major}
-- 年级：${answers.year}
-- 技术水平：${answers.tech_level}
-- CC了解度：${answers.cc_knowledge}
-- 目标：${answers.goal}
-- 每周可投入时间：${answers.time}
+【用户画像】
+- 专业方向：${labels.major[answers.major] || answers.major}
+- 年级：${labels.year[answers.year] || answers.year}
+- 编程水平：${labels.tech_level[answers.tech_level] || answers.tech_level}
+- Claude Code了解程度：${labels.cc_knowledge[answers.cc_knowledge] || answers.cc_knowledge}
+- 主要目标：${labels.goal[answers.goal] || answers.goal}
+- 可投入时间：${labels.time[answers.time] || answers.time}
     `.trim();
 
-    const systemPrompt = `你是一个帮助大学生学习AI工具的职业规划助手。你的任务是根据用户的情况，生成一条具体、可执行、可验证的Claude Code学习路线。
+    const systemPrompt = `你是一个帮助大学生学习Claude Code的实战导师。用户是一所中国大学的在读学生。你的任务是根据用户的真实情况，给出一条只有TA能走的、不和别人重复的学习路线。
 
-规则：
-1. 路线必须具体到"第一步做什么""第二步做什么"
-2. 每一步都要可执行，不是空泛的建议
-3. 结合用户的专业背景给出结合点
-4. 如果用户目标是赚钱，给出具体的变现路径和预估收入
-5. 标明每一步预计需要的时间
-6. 不要编造不存在的功能或资源
-7. 用中文回答，结构清晰
-8. 控制回复在500字以内`;
+【红线——以下内容绝对不能出现】
+- "安装Node.js和Git"——这属于环境搭建基础，不需要你说
+- "写一个Hello World脚本"——太简单，没价值
+- "写一个待办事项应用"——烂大街的教程项目，没有个性化
+- "上传GitHub作作品集"——每个学生都知道的事
+- 任何像通用教程一样的话
+
+【你必须做到的】
+1. 结合用户的专业：如果用户学的是化学，就不要让他做网页；如果学的是设计，就教他用CC生成设计稿。专业和CC必须有交叉点。
+2. 根据用户的年级给不同建议：大一大二侧重探索+积累，大三侧重实习作品，大四侧重就业变现。
+3. 根据技术水平调整起点：零基础从"让CC帮你做你本来就在做的事"开始；有基础的直接跳到工作流变现。
+4. 路径要窄：不要给5条路让用户选，给1条最适合TA的路。
+5. 每一步都要有"为什么这一步适合TA"的理由，不是光说做什么。
+6. 给的例子要带TA的专业背景。比如给数学系的例子是"用CC做数据建模"，给中文系的是"用CC做文本分析"。
+7. 回复控制在300字以内。不要废话。不要客套。直接给路线。`;
 
     const aiAnalysis = await callDeepSeek(systemPrompt, profileSummary);
 
